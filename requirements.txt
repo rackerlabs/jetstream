@@ -1,0 +1,5 @@
+troposphere==1.8.1
+pyyaml
+awscli
+boto
+awacs
