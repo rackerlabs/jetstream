@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+'''Python setup.py'''
 
 import ast
 import re
@@ -8,6 +9,11 @@ DEPENDENCIES = [
     'troposphere==1.8.1',
     'boto3==1.4.0',
     'awacs',
+]
+
+STYLE_REQUIRES = [
+    'flak8>=2.5.4',
+    'pylint>=1.5.5',
 ]
 
 TESTS_REQUIRE = []
@@ -42,7 +48,7 @@ setup(
     description='',
     keywords='',
     version=_lu_meta['version'],
-    tests_require=TESTS_REQUIRE,
+    tests_require=TESTS_REQUIRE + STYLE_REQUIRES,
     install_requires=DEPENDENCIES,
     packages=find_packages(exclude=['tests']),
     classifiers=[

@@ -14,11 +14,10 @@
 
 '''Code to publish the CloudFormationstemplates'''
 
-import os
 import json
-
-from logging import getLogger
+import os
 from os import path
+from logging import getLogger
 
 import boto3
 import botocore
@@ -60,14 +59,14 @@ class S3Publisher(object):
             body_obj = json.load(body)
             latest_obj = json.loads(latest)
             return bool(cmp(latest_obj, body_obj))
-        except botocore.exceptions.ClientError as e:
-            if 'specified key does not exist' in str(e):
+        except botocore.exceptions.ClientError as excep:
+            if 'specified key does not exist' in str(excep):
                 return True
             else:
-                raise e
-        except ValueError as e:
-            if 'No JSON object could be decoded' not in str(e):
-                raise e
+                raise excep
+        except ValueError as excep:
+            if 'No JSON object could be decoded' not in str(excep):
+                raise excep
         return True
 
     def publish_file(self, name, contents):
@@ -107,9 +106,9 @@ class LocalPublisher(object):
             fil.close()
             latest_obj = json.loads(latest)
             return bool(cmp(latest_obj, existing))
-        except IOError as e:
-            if 'No such file or directory:' not in str(e):
-                raise e
+        except IOError as excep:
+            if 'No such file or directory:' not in str(excep):
+                raise excep
         return True
 
     def publish_file(self, name, contents):

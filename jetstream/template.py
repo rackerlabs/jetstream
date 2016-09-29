@@ -15,7 +15,6 @@
 '''Template Class to be overridden by Template'''
 
 import sys
-import traceback
 import collections
 import json
 import copy
@@ -35,10 +34,9 @@ def load_template(package, template):
         template_object = getattr(imported_module, template_class)()
         return template_object
     except:
-        extype, ex, tb = sys.exc_info()
-        traceback.format_exception_only(extype, ex)[-1]
-        message = "Failed to load template %s: %s" % (template, str(ex))
-        raise RuntimeError, message, tb
+        _, excep, trace = sys.exc_info()
+        message = "Failed to load template %s: %s" % (template, str(excep))
+        raise RuntimeError, message, trace
 
 
 def load_templates(package):
@@ -91,6 +89,7 @@ class TestParameters(object):
         self._parameters.append(parameter)
 
     def dict(self):
+        '''Returns the Test Parameters as a dictionary'''
         params = {}
         for param in self._parameters:
             params[param.name()] = param.value()
@@ -133,6 +132,7 @@ class JetstreamTemplate(object):
             setattr(self, name, default)
 
     def document_name(self):
+        '''Returns the Markdown Document name'''
         return self.name.split('.')[0] + '.md'
 
     def resource_name(self):
@@ -210,12 +210,12 @@ class JetstreamEncoder(json.JSONEncoder):
 
         # if it's the top level dict, do a reasonable order
         if isinstance(obj, (dict)) and 'Resources' in obj:
-            d = collections.OrderedDict()
+            dikt = collections.OrderedDict()
             for k in TOP_LEVEL_DICT_ORDER:
                 if k in obj:
-                    d[k] = obj[k]
+                    dikt[k] = obj[k]
 
-            return json.JSONEncoder.encode(self, d)
+            return json.JSONEncoder.encode(self, dikt)
         return json.JSONEncoder.encode(self, obj)
 
 
