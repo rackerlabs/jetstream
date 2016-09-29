@@ -19,9 +19,11 @@ import time
 from logging import getLogger
 from troposphere import Template
 from troposphere.cloudformation import Stack
-from jetstream.publisher import S3Publisher
 
 import boto3
+
+from jetstream.publisher import S3Publisher
+
 
 LOG = getLogger(__name__)
 
@@ -116,9 +118,10 @@ class Test(object):
         for templ in self.templates:
             stack_name = templ.resource_name()
             templ_url = "{}/{}".format(self._bucket_url, templ.name)
+            params = templ.test_params.dict()
             master_templ.add_resource(Stack(stack_name,
-                                      TemplateURL=templ_url,
-                                      Parameters=templ.test_params.dict()))
+                                            TemplateURL=templ_url,
+                                            Parameters=params))
 
         return master_templ.to_json()
 

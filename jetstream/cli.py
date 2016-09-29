@@ -33,16 +33,16 @@ def _execute(args):
     elif args.publisher == 's3':
         publish = publisher.S3Publisher(args.path, args.public)
     else:
-        print("Unsupported Publisher {}".format(args.publisher))
+        raise Exception("Unsupported publisher {}".format(args.publisher))
 
     templates = template.load_templates(args.package)
     updated_templates = []
-    for name, tmpl in templates.items():
+    for _, tmpl in templates.items():
         if publish.newer(tmpl.name, tmpl.generate()):
             updated_templates.append(tmpl)
     if updated_templates:
         print("Updated Templates: " + ', '.join(
-            map(lambda n: n.name, updated_templates)))
+            [t.name for t in updated_templates]))
     else:
         print("No updated templates found")
         return
@@ -71,7 +71,7 @@ def _execute(args):
         sys.exit(1)
 
 
-def main(argv=None):
+def main():
     '''Main function'''
     import argparse
 
