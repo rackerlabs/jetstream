@@ -13,7 +13,12 @@ Features that are available with Jetstream and Troposphere:
 - Is able to publish to S3 and to a Local File System (Jetstream)
 
 ###Setup
-To install Jetstream you need to clone down the repository and
+To install Jetstream from Pypi:
+```shell
+pip install jetstream
+```
+
+To install Jetstream from git you need to clone down the repository and
 pip install.
 
 ```shell
