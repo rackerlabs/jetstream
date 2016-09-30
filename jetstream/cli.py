@@ -53,9 +53,11 @@ def _execute(args):
         test = testing.Test(updated_templates)
         test_passed = test.run()
 
-        # If not running in debug mode clean up the test
-        if not args.debug and test_passed:
-            test.cleanup()
+        if not args.debug:
+            if args.cleanup == 'pass' and test_passed:
+                test.cleanup()
+            elif args.cleanup == 'failure' and not test_passed:
+                test.cleanup()
 
     # Publish latest templates
     if test_passed:
@@ -109,6 +111,13 @@ def main():
     parser.add_argument('--public', action='store_true',
                         help='Whether S3 Published documents should be public',
                         default=False)
+
+    test_conditions = ['never', 'failure', 'pass']
+    cleanup_help = "Test condition to cleanup ({}) defaults to pass".format(
+        ', '.join(test_conditions))
+    parser.add_argument('--clean-on', dest='cleanup',
+                        help=cleanup_help,
+                        default='pass')
 
     verbose = parser.add_mutually_exclusive_group()
     verbose.add_argument('-V', dest='loglevel', action='store_const',
