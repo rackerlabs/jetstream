@@ -121,11 +121,13 @@ class Test(object):
         master_templ = Template()
         for templ in self.templates:
             stack_name = templ.resource_name()
-            templ_url = "{}/{}".format(self._bucket_url, templ.name)
+            stack_params = {}
+            stack_params['TemplateURL'] = "{}/{}".format(self._bucket_url,
+                                                         templ.name)
             params = templ.test_params.dict()
-            master_templ.add_resource(Stack(stack_name,
-                                            TemplateURL=templ_url,
-                                            Parameters=params))
+            if params:
+                stack_params['Parameters'] = params
+            master_templ.add_resource(Stack(stack_name, **stack_params))
 
         return master_templ.to_json()
 
