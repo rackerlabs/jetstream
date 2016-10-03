@@ -92,11 +92,15 @@ class Test(object):
 
             if 'ROLLBACK' in stack_status and not stack_failure:
                 stack_failure = True
-                LOG.error("Stack %s failure occurred: %s",
-                          stack_name, stack_status)
-                LOG.error("Reason: %s", str(stack_info))
-                stack_status_reason = stack_info['StackStatusReason']
-                LOG.error("Reason: %s", stack_status_reason)
+
+                # log at the time of failure, so we get all the data
+                self._log_failed_stacks(stack_name)
+
+            # stack rollback failed, will never be COMPLETE
+            if 'ROLLBACK_FAILED' in stack_status:
+                LOG.error("Stack %s rollback failed, fix manually",
+                          stack_name)
+                break
 
             LOG.info("Stack %s is not COMPLETE", stack_name)
             time.sleep(10)
@@ -124,6 +128,31 @@ class Test(object):
                                             Parameters=params))
 
         return master_templ.to_json()
+
+    def _log_failed_stacks(self, stack_name):
+        """Log stack events that have FAILED status"""
+        stack_resp = self._client.describe_stacks(StackName=stack_name)
+        stack_data = stack_resp['Stacks'][0]
+
+        optional_reason = 'No reason found'
+        if 'StackStatusReason' in stack_data:
+            optional_reason = stack_data['StackStatusReason']
+
+        # log the high level stack data
+        LOG.error("Stack %s failure %s occurred: %s",
+                  stack_data['StackName'],
+                  stack_data['StackStatus'],
+                  optional_reason)
+        LOG.debug("Full trace: %s", str(stack_data))
+
+        stack_events_resp = self._client.describe_stack_events(
+            StackName=stack_name)
+
+        for e in stack_events_resp['StackEvents']:
+            if 'ResourceStatus' in e and 'FAILED' in e['ResourceStatus']:
+                LOG.error("%s: %s",
+                          e['EventId'],
+                          e['ResourceStatusReason'])
 
 
 def _flatten_templates(templates):
