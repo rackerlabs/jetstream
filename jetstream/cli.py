@@ -54,7 +54,8 @@ def _execute(args):
         test_passed = test.run()
 
         if not args.debug:
-            if args.cleanup == 'pass' and test_passed:
+            if args.cleanup == 'pass' or args.cleanup == 'failure' and \
+                    test_passed:
                 test.cleanup()
             elif args.cleanup == 'failure' and not test_passed:
                 test.cleanup()
