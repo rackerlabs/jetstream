@@ -186,14 +186,22 @@ class JetstreamTemplate(object):
                 except KeyError:
                     pass
 
-        original_template = tmpl.to_json(sort_keys=False)
-        parsed_template = json.loads(original_template)
-        encoded_template = json.dumps(
-            parsed_template,
-            sort_keys=False, indent=4,
-            cls=JetstreamEncoder)
+        try:
+            # sometimes, tmpl.to_json throws an exception
+            original_template = tmpl.to_json(sort_keys=False)
+            parsed_template = json.loads(original_template)
+            encoded_template = json.dumps(
+                parsed_template,
+                sort_keys=False, indent=4,
+                cls=JetstreamEncoder)
 
-        return encoded_template
+            return encoded_template
+        except:
+            _, excep, trace = sys.exc_info()
+            class_name = type(self).__name__
+            message = "Failed to build JSON for template %s: %s" % (class_name, str(excep))
+            raise RuntimeError, message, trace
+
 
 TOP_LEVEL_DICT_ORDER = [
     'AWSTemplateFormatVersion', 'Description', 'Metadata',
