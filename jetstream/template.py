@@ -199,7 +199,8 @@ class JetstreamTemplate(object):
         except:
             _, excep, trace = sys.exc_info()
             class_name = type(self).__name__
-            message = "Failed to build JSON for template %s: %s" % (class_name, str(excep))
+            message = "Failed to build JSON for template %s: %s" \
+                % (class_name, str(excep))
             raise RuntimeError, message, trace
 
 
