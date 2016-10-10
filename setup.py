@@ -6,7 +6,7 @@ import re
 from setuptools import setup, find_packages
 
 DEPENDENCIES = [
-    'troposphere==1.8.1',
+    'troposphere==1.8.2',
     'boto3==1.4.0',
     'awacs',
 ]
