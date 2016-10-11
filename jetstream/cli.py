@@ -51,7 +51,12 @@ def _execute(args):
     test_passed = True
     if args.test and updated_templates:
         test = testing.Test(updated_templates)
-        test_passed = test.run()
+        try:
+            test_passed = test.run()
+        except (KeyboardInterrupt, SystemExit):
+            print("Interrupt caught... cleaning up the test")
+            test.cleanup()
+            sys.exit(1)
 
         if not args.debug:
             if args.cleanup == 'pass' or args.cleanup == 'failure' and \
