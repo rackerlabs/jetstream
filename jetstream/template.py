@@ -193,6 +193,7 @@ class JetstreamTemplate(object):
             encoded_template = json.dumps(
                 parsed_template,
                 sort_keys=False, indent=2,
+                separators=(',', ': '),
                 cls=JetstreamEncoder)
 
             return encoded_template
