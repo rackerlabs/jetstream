@@ -21,7 +21,7 @@ import copy
 
 from datetime import datetime
 from importlib import import_module
-from troposphere import GetAtt
+from troposphere import GetAtt, BaseAWSObject
 
 
 def load_template(package, template):
@@ -57,7 +57,12 @@ def load_templates(package):
 class TestParameter(object):
     '''Test Parameter'''
     def __init__(self, name, value, source=None):
-        self._name = name
+        # If the name passed in was an AWSObject then
+        # set the _name to the title of the object.
+        if isinstance(name, BaseAWSObject):
+            self._name = name.title
+        else:
+            self._name = name
         self._value = value
         self._source = source
 
