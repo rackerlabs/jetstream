@@ -166,6 +166,8 @@ def _recurse_dependencies(templates):
     '''Flattens templates by recursively going through templates'''
     flattened_templ = {}
     for templ in templates:
+        templ.prepare_test()  # testing hook may add dependencies
+
         if not flattened_templ.get(templ.name):
             flattened_templ[templ.name] = templ
         if templ.test_params.dependencies():

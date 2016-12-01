@@ -128,3 +128,9 @@ A --> B -> C
       |    |
       | ----> D
 ```
+
+If you extend the Jetstream template class, you can implement the following
+methods to hook into jetstream's behavior from your subclass:
+- `def prepare_document(self):` run before template documentation is generated
+- `def prepare_generate(self):` run before template is generated
+- `def prepare_test(self):` run before template is tested
