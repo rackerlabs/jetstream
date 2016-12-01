@@ -125,6 +125,21 @@ class JetstreamTemplate(object):
         self._resource_name = None
         self.test_params = None
 
+    def prepare_document(self):
+        '''Lifecycle hook in case template wants to do any additional work'''
+        # override this method to run anything
+        pass
+
+    def prepare_generate(self):
+        '''Lifecycle hook in case template wants to do any additional work'''
+        # override this method to run anything
+        pass
+
+    def prepare_test(self):
+        '''Lifecycle hook in case template wants to do any additional work'''
+        # override this method to run anything
+        pass
+
     def _required_attrs(self, attrs):
         '''Validate that required attrs were set in a template'''
         for attr in attrs:
@@ -153,6 +168,8 @@ class JetstreamTemplate(object):
 
     def document(self):
         '''Returns documentation for the template'''
+        self.prepare_document()  # prepare template
+
         self._required_attrs(['template', 'name'])
         doc = []
         header_text = "{} FAWS Template".format(self.resource_name())
@@ -175,6 +192,7 @@ class JetstreamTemplate(object):
 
     def generate(self, testing=False):
         '''Returns the generated cf template'''
+        self.prepare_generate()  # prepare template
 
         # validation steps and proper resource name
         self._required_attrs(['template', 'name'])
