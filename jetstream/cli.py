@@ -49,7 +49,7 @@ def _execute(args):
 
     # If the test flag is set then run a test
     test_passed = True
-    if args.test and updated_templates:
+    if (args.test and updated_templates) or args.force_test:
         test = testing.Test(updated_templates)
         try:
             test_passed = test.run()
@@ -103,6 +103,12 @@ def main():
     parser.add_argument('--test', '-t', dest='test',
                         action='store_true',
                         help='Whether to run tests',
+                        default=False)
+    parser.add_argument('--force_test', '-T', dest='force_test',
+                        action='store_true',
+                        help='Whether to force a test '
+                             'run even if templates '
+                             'have not changed',
                         default=False)
     parser.add_argument('--documentation', '-d',
                         dest='document',
