@@ -45,7 +45,6 @@ def _execute(args):
             [t.name for t in updated_templates]))
     else:
         print("No updated templates found")
-        return
 
     # If the test flag is set then run a test
     test_passed = True
@@ -69,6 +68,8 @@ def _execute(args):
     if test_passed:
         if args.no_publish:
             print("No publish set ... not publishing")
+        elif not updated_templates:
+            print("No templates were updated ... not publishing")
         else:
             for tmpl in updated_templates:
                 publish.publish_file(tmpl.name, tmpl.generate())
