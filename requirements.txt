@@ -1,4 +1,4 @@
-troposphere==1.9.0
+troposphere==1.9.1
 pyyaml
 awscli
 boto
