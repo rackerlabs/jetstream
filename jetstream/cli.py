@@ -45,10 +45,11 @@ def _execute(args):
             [t.name for t in updated_templates]))
     else:
         print("No updated templates found")
+        return
 
     # If the test flag is set then run a test
     test_passed = True
-    if (args.test and updated_templates) or args.force_test:
+    if args.test and updated_templates:
         test = testing.Test(updated_templates)
         try:
             test_passed = test.run()
@@ -68,8 +69,6 @@ def _execute(args):
     if test_passed:
         if args.no_publish:
             print("No publish set ... not publishing")
-        elif not updated_templates:
-            print("No templates were updated ... not publishing")
         else:
             for tmpl in updated_templates:
                 publish.publish_file(tmpl.name, tmpl.generate())
@@ -104,12 +103,6 @@ def main():
     parser.add_argument('--test', '-t', dest='test',
                         action='store_true',
                         help='Whether to run tests',
-                        default=False)
-    parser.add_argument('--force_test', '-T', dest='force_test',
-                        action='store_true',
-                        help='Whether to force a test '
-                             'run even if templates '
-                             'have not changed',
                         default=False)
     parser.add_argument('--documentation', '-d',
                         dest='document',
