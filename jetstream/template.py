@@ -210,11 +210,9 @@ class JetstreamTemplate(object):
                     pass
 
         try:
-            # sometimes, tmpl.to_json throws an exception
-            original_template = tmpl.to_json(sort_keys=False)
-            parsed_template = json.loads(original_template)
+            # Handle JSON.dumps failing
             encoded_template = json.dumps(
-                parsed_template,
+                tmpl.to_dict(),
                 sort_keys=False, indent=2,
                 separators=(',', ': '),
                 cls=JetstreamEncoder)
