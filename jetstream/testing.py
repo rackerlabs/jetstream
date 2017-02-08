@@ -51,7 +51,7 @@ class Test(object):
 
         LOG.info("Uploading files")
         self.s3_publisher.publish_file('master.template',
-                                       self._parent_template())
+                                       self.parent_template())
         for templ in self.templates:
             LOG.info("Uploading file: %s", templ.name)
             self.s3_publisher.publish_file(templ.name,
@@ -114,7 +114,7 @@ class Test(object):
             TemplateURL=parent_templ,
             Capabilities=['CAPABILITY_IAM'])
 
-    def _parent_template(self):
+    def parent_template(self):
         '''
         Generate the parent template for the test
         '''
