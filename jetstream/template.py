@@ -63,6 +63,13 @@ class TestParameter(object):
             self._name = name.title
         else:
             self._name = name
+
+        if not isinstance(value, basestring):
+            s = "TestParameter value must be of type string, not {}".format(
+                str(type(value))
+            )
+            raise TypeError(s)
+
         self._value = value
         self._source = source
 
