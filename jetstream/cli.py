@@ -47,14 +47,10 @@ def _execute(args):
         print("No updated templates found")
         return
 
-    # build the test parameters, even if we don't run tests, to catch errors
-    # where JSON can't be generated / objects can't be serialized
-    test = testing.Test(updated_templates)
-    test.parent_template()
-
     # If the test flag is set then run a test
     test_passed = True
     if args.test and updated_templates:
+        test = testing.Test(updated_templates)
         try:
             test_passed = test.run()
         except (KeyboardInterrupt, SystemExit):
