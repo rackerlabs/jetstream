@@ -186,7 +186,7 @@ class JetstreamTemplate(object):
         # Parameters
         doc.append('###Parameters')
         for name, param in self.template.parameters.items():
-            doc.append('####' + name)
+            doc.append('\n####' + name)
             for prop, value in param.properties.items():
                 doc.append("- {}: `{}`".format(prop, value))
 
