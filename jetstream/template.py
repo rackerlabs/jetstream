@@ -191,7 +191,7 @@ class JetstreamTemplate(object):
                 doc.append("- {}: `{}`".format(prop, value))
 
         # Outputs
-        doc.append('###Outputs')
+        doc.append('\n###Outputs')
         for name in self.template.outputs.keys():
             doc.append("- `{}`".format(name))
 
