@@ -17,7 +17,8 @@
 
 import time
 
-from jetstream.template import JetstreamTemplate, TestParameters, TestParameter
+from jetstream.template import (JetstreamTemplate, TestParameterGroup,
+                                TestParameter, TestParameterGroups)
 from troposphere import Parameter, Ref, Tags, Template, Output, Join
 from troposphere.s3 import Bucket
 
@@ -27,7 +28,12 @@ class S3Bucket(JetstreamTemplate):
     def __init__(self):
         self.name = 's3.template'
         self.template = Template()
-        self.test_params = TestParameters()
+        self.test_parameter_groups = TestParameterGroups()
+
+        default_test_params = TestParameterGroup()
+        secondary_test_params = TestParameterGroup()
+        self.test_parameter_groups.add(default_test_params)
+        self.test_parameter_groups.add(secondary_test_params, 'secondary')
 
         self.template.add_version("2010-09-09")
 
@@ -41,7 +47,7 @@ class S3Bucket(JetstreamTemplate):
                            "LogDeliveryWrite", "Private",
                            "PublicRead", "PublicReadWrite"],
         ))
-        self.test_params.add(TestParameter("AccessControl", "Private"))
+        default_test_params.add(TestParameter("AccessControl", "Private"))
 
         Environment = self.template.add_parameter(Parameter(
             "Environment",
@@ -51,7 +57,8 @@ class S3Bucket(JetstreamTemplate):
             AllowedValues=["Development", "Integration",
                            "PreProduction", "Production", "Staging", "Test"],
         ))
-        self.test_params.add(TestParameter("Environment", "Integration"))
+        default_test_params.add(TestParameter("Environment", "Integration"))
+        secondary_test_params.add(TestParameter("Environment", "Staging"))
 
         BucketName = self.template.add_parameter(Parameter(
             "BucketName",
@@ -63,7 +70,9 @@ class S3Bucket(JetstreamTemplate):
             Description="The name of the bucket to use. Must be unique.",
         ))
         bucket_name = "test-bucket-{}".format(int(time.time()))
-        self.test_params.add(TestParameter("BucketName", bucket_name))
+        default_test_params.add(TestParameter("BucketName", bucket_name))
+        secondary_test_params.add(TestParameter(
+            "BucketName", bucket_name + "secondary"))
 
         self.template.add_resource(Bucket(
             "S3Bucket",

@@ -56,7 +56,7 @@ def load_templates(package):
 
 class TestParameter(object):
     '''Test Parameter'''
-    def __init__(self, name, value, source=None):
+    def __init__(self, name, value, source=None, source_set_name=None):
         # If the name passed in was an AWSObject then
         # set the _name to the title of the object.
         if isinstance(name, BaseAWSObject):
@@ -73,6 +73,10 @@ class TestParameter(object):
         self._value = value
         self._source = source
 
+        self._source_set_name = source_set_name
+        if not self._source_set_name:
+            self._source_set_name = 'default'
+
     def source(self):
         '''Returns template the value comes from'''
         return self._source
@@ -86,10 +90,12 @@ class TestParameter(object):
         if not self._source:
             return self._value
 
-        return GetAtt(self._source.resource_name(), "Outputs." + self._value)
+        return GetAtt(
+            self._source.resource_name() + self._source_set_name.capitalize(),
+            "Outputs." + self._value)
 
 
-class TestParameters(object):
+class TestParameterGroup(object):
     '''Test Parameters object'''
     def __init__(self):
         self._parameters = []
@@ -123,6 +129,30 @@ class TestParameters(object):
         return deps.values()
 
 
+class TestParameterGroups(object):
+    '''Test ParameterGroups object'''
+    def __init__(self):
+        self._groups = {}
+
+    def groups(self):
+        '''return the test parameter groups'''
+        return self._groups
+
+    def add(self, group, name=None):
+        '''Method to add a new TestParameterGroup'''
+        if not name:
+            self._groups['default'] = group
+        else:
+            self._groups[name] = group
+
+    def remove(self, name):
+        '''Removes a group by name'''
+        if not self._groups.get(name):
+            raise AttributeError(
+                'No TestParameterGroup named {} found'.format(name))
+        del self._groups[name]
+
+
 class JetstreamTemplate(object):
     '''Template class'''
     def __init__(self):
@@ -130,7 +160,15 @@ class JetstreamTemplate(object):
         self.template = None
         self.name = None
         self._resource_name = None
-        self.test_params = None
+        self.test_parameter_groups = None
+
+    def get_test_parameter_groups(self):
+        ''' Returns all Test Parameter Groups Associated with the template'''
+        if (hasattr(self, 'test_parameter_groups') and
+                self.test_parameter_groups):
+            return self.test_parameter_groups.groups()
+
+        return {}
 
     def prepare_document(self):
         '''Lifecycle hook in case template wants to do any additional work'''
