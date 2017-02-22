@@ -196,8 +196,8 @@ def _recurse_dependencies(templates):
         if not flattened_templ.get(templ.name):
             flattened_templ[templ.name] = templ
 
-        for _, test_params in templ.get_test_parameter_groups().items():
-            if test_params.dependencies():
+        for _, test_param_group in templ.get_test_parameter_groups().items():
+            if test_param_group.dependencies():
                 flattened_templ.update(
-                    _recurse_dependencies(test_params.dependencies()))
+                    _recurse_dependencies(test_param_group.dependencies()))
     return flattened_templ
