@@ -15,14 +15,16 @@
 '''Testing module'''
 
 import time
+import os
 
+from os import path
 from logging import getLogger
 from troposphere import Template
 from troposphere.cloudformation import Stack
 
 import boto3
 
-from jetstream.publisher import S3Publisher
+from jetstream.publisher import S3Publisher, LocalPublisher
 
 
 LOG = getLogger(__name__)
@@ -34,35 +36,47 @@ class Test(object):
 
     CRUD for CloudFormation testing
     '''
-    def __init__(self, templates):
+    def __init__(self, templates, dry_run=False):
         self.templates = _flatten_templates(templates)
         timestamp = int(time.time())
         self._bucket = "jetstream-test-{}".format(timestamp)
         self._stack_name = "JetstreamTest{}".format(timestamp)
         self._bucket_url = "https://s3.amazonaws.com/{}".format(self._bucket)
-        self._client = boto3.client('cloudformation')
-        self.s3_publisher = S3Publisher(self._bucket, public=False)
+        self._dry_run = dry_run
+
+        if self._dry_run:
+            self.publisher = LocalPublisher(
+                path.join(os.getcwd(), self._bucket))
+        else:
+            self._client = boto3.client('cloudformation')
+            self.publisher = S3Publisher(self._bucket, public=False)
 
     def run(self):
         '''Run the test'''
-        LOG.info("Creating bucket %s", self._bucket)
-        boto3.client('s3').create_bucket(Bucket=self._bucket)
-        LOG.info("Bucket %s created", self._bucket)
+        if not self._dry_run:
+            LOG.info("Creating bucket %s", self._bucket)
+            boto3.client('s3').create_bucket(Bucket=self._bucket)
+            LOG.info("Bucket %s created", self._bucket)
 
         LOG.info("Uploading files")
-        self.s3_publisher.publish_file('master.template',
-                                       self.parent_template())
+        self.publisher.publish_file('master.template',
+                                    self.parent_template())
         for templ in self.templates:
             LOG.info("Uploading file: %s", templ.name)
-            self.s3_publisher.publish_file(templ.name,
-                                           templ.generate(testing=True))
+            self.publisher.publish_file(templ.name,
+                                        templ.generate(testing=True))
 
-        LOG.info("Creating stack %s...", self._stack_name)
-        self._build_stack()
-        return self._wait_results(self._stack_name)
+        if self._dry_run:
+            return True
+        else:
+            LOG.info("Creating stack %s...", self._stack_name)
+            self._build_stack()
+            return self._wait_results(self._stack_name)
 
     def cleanup(self):
         '''Clean up the testing stack and bucket'''
+        if self._dry_run:
+            return
         s3_client = boto3.client('s3')
         resp = s3_client.list_objects(Bucket=self._bucket)
         contents = resp.get('Contents')
