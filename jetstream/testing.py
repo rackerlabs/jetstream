@@ -134,14 +134,25 @@ class Test(object):
         '''
         master_templ = Template()
         for templ in self.templates:
-            stack_name = templ.resource_name()
-            stack_params = {}
-            stack_params['TemplateURL'] = "{}/{}".format(self._bucket_url,
-                                                         templ.name)
-            params = templ.test_params.dict()
-            if params:
-                stack_params['Parameters'] = params
-            master_templ.add_resource(Stack(stack_name, **stack_params))
+            template_url = "{}/{}".format(self._bucket_url,
+                                          templ.name)
+            # Create a test template for every set of test parameters
+            if len(templ.get_test_parameter_groups()) == 0:
+                stack_params = {}
+                stack_params['TemplateURL'] = template_url
+                stack_name = templ.resource_name() + 'Default'
+                master_templ.add_resource(Stack(stack_name, **stack_params))
+                continue
+
+            for set_name, p_set in templ.get_test_parameter_groups().items():
+                stack_params = {}
+                stack_params['TemplateURL'] = template_url
+                stack_name = templ.resource_name() + set_name.capitalize()
+                params = p_set.dict()
+
+                if params:
+                    stack_params['Parameters'] = params
+                master_templ.add_resource(Stack(stack_name, **stack_params))
 
         return master_templ.to_json()
 
@@ -184,7 +195,9 @@ def _recurse_dependencies(templates):
 
         if not flattened_templ.get(templ.name):
             flattened_templ[templ.name] = templ
-        if templ.test_params.dependencies():
-            flattened_templ.update(
-                _recurse_dependencies(templ.test_params.dependencies()))
+
+        for _, test_params in templ.get_test_parameter_groups().items():
+            if test_params.dependencies():
+                flattened_templ.update(
+                    _recurse_dependencies(test_params.dependencies()))
     return flattened_templ

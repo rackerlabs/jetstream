@@ -15,7 +15,8 @@
 '''EC2 Instance Template'''
 
 
-from jetstream.template import JetstreamTemplate, TestParameters, TestParameter
+from jetstream.template import (JetstreamTemplate, TestParameterGroup,
+                                TestParameter, TestParameterGroups)
 from troposphere import Parameter, Ref, Tags, Template
 from troposphere.ec2 import Instance
 from troposphere.iam import InstanceProfile, Role, Policy
@@ -28,9 +29,11 @@ class EC2Instance(JetstreamTemplate):
     def __init__(self):
         self.name = 'ec2.template'
         self.template = Template()
-        self.test_params = TestParameters()
 
         self.template.add_version("2010-09-09")
+        self.test_parameter_groups = TestParameterGroups()
+        default_test_params = TestParameterGroup()
+        self.test_parameter_groups.add(default_test_params)
 
         Environment = self.template.add_parameter(Parameter(
             "Environment",
@@ -40,20 +43,20 @@ class EC2Instance(JetstreamTemplate):
             AllowedValues=["Development", "Integration",
                            "PreProduction", "Production", "Staging", "Test"],
         ))
-        self.test_params.add(TestParameter("Environment", "Integration"))
+        default_test_params.add(TestParameter("Environment", "Integration"))
 
         Bucket = self.template.add_parameter(Parameter(
             "S3Bucket",
             Type="String",
             Description="S3 Bucket",
         ))
-        self.test_params.add(TestParameter("S3Bucket", "Arn", S3Bucket()))
+        default_test_params.add(TestParameter("S3Bucket", "Arn", S3Bucket()))
         ImageId = self.template.add_parameter(Parameter(
             "ImageId",
             Type="String",
             Description="Image Id"
         ))
-        self.test_params.add(TestParameter("ImageId", "ami-6869aa05"))
+        default_test_params.add(TestParameter("ImageId", "ami-6869aa05"))
 
         self.template.add_resource(Instance(
             "EC2Instance",
@@ -94,3 +97,4 @@ class EC2Instance(JetstreamTemplate):
             Path="/",
             Roles=[Ref(EC2InstanceRole)]
         ))
+
