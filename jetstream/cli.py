@@ -50,7 +50,7 @@ def _execute(args):
     # If the test flag is set then run a test
     test_passed = True
     if args.test and updated_templates:
-        test = testing.Test(updated_templates)
+        test = testing.Test(updated_templates, dry_run=args.dry_test)
         try:
             test_passed = test.run()
         except (KeyboardInterrupt, SystemExit):
@@ -103,6 +103,10 @@ def main():
     parser.add_argument('--test', '-t', dest='test',
                         action='store_true',
                         help='Whether to run tests',
+                        default=False)
+    parser.add_argument('--dry-test', '-T', dest='dry_test',
+                        action='store_true',
+                        help='Generate test templates locally',
                         default=False)
     parser.add_argument('--documentation', '-d',
                         dest='document',

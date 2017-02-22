@@ -55,3 +55,4 @@ target/
 
 *.zip
 artifacts
+jetstream-test*
