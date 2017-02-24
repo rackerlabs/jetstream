@@ -49,7 +49,7 @@ class Test(object):
                 path.join(os.getcwd(), self._bucket))
         else:
             self._client = boto3.client('cloudformation')
-            self.publisher = S3Publisher(self._bucket, public=False)
+            self.publisher = S3Publisher("s3://" + self._bucket, public=False)
 
     def run(self):
         '''Run the test'''

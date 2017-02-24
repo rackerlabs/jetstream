@@ -15,6 +15,7 @@
 '''Code to publish the CloudFormationstemplates'''
 
 import json
+import re
 import os
 from os import path
 from logging import getLogger
@@ -24,12 +25,22 @@ import botocore
 
 LOG = getLogger(__name__)
 
+BUCKET_REGEX = r"^s3://([a-zA-Z0-9\_\-\.]+)/?([a-zA-Z0-9\_\-\.\/]+)?"
+
 
 class S3Publisher(object):
     '''Publishes files to S3'''
-    def __init__(self, bucket, public=True):
+    def __init__(self, bucket_path, public=True):
         self._client = boto3.client('s3')
-        self.bucket = bucket
+
+        res = re.search(BUCKET_REGEX, bucket_path)
+        if not res:
+            raise AttributeError(
+                "Invalid bucket path {}, must match {}".format(
+                    bucket_path, BUCKET_REGEX))
+
+        self.bucket = res.group(1)
+        self.path = res.group(2)
         self.public = public
 
         if not self._bucket_exists():
@@ -50,9 +61,13 @@ class S3Publisher(object):
         '''
         resp = None
         try:
+            key = name
+            if self.path:
+                key = path.join(self.path, key)
+
             resp = self._client.get_object(
                 Bucket=self.bucket,
-                Key=name,
+                Key=key,
             )
 
             body = resp.get('Body')
@@ -76,10 +91,15 @@ class S3Publisher(object):
         acl = 'private'
         if self.public:
             acl = 'public-read'
+
+        key = name
+        if self.path:
+            key = path.join(self.path, key)
+
         resp = self._client.put_object(
             Body=contents,
             Bucket=self.bucket,
-            Key=name,
+            Key=key,
             ACL=acl,
         )
         LOG.debug("Response: %s", resp)
