@@ -43,14 +43,6 @@ class S3Publisher(object):
         self.path = res.group(2)
         self.public = public
 
-    def _validate_bucket_exists(self):
-        '''Check if S3 Bucket exists'''
-        try:
-            self._client.head_bucket(Bucket=self.bucket)
-        except botocore.exceptions.ClientError:
-            raise Exception('Bucket {} does not exist'.format(
-                self.bucket))
-
     def newer(self, name, latest):
         '''
         Compare existing file with the latest
@@ -58,8 +50,6 @@ class S3Publisher(object):
         - name - name of the file
         - latest - new contents to compare with existing
         '''
-        self._validate_bucket_exists()
-
         resp = None
         try:
             key = name
@@ -89,8 +79,6 @@ class S3Publisher(object):
         ''' Publish a file to S3'''
         if not self.newer(name, contents):
             return
-
-        self._validate_bucket_exists()
 
         acl = 'private'
         if self.public:
