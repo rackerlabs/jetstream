@@ -49,7 +49,10 @@ class S3Publisher(object):
 
     def _bucket_exists(self):
         '''Check if S3 Bucket exists'''
-        # TODO: Implement
+        try:
+            self._client.head_bucket(Bucket=self.bucket)
+        except botocore.exceptions.ClientError:
+            return False
         return True
 
     def newer(self, name, latest):
