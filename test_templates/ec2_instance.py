@@ -97,4 +97,3 @@ class EC2Instance(JetstreamTemplate):
             Path="/",
             Roles=[Ref(EC2InstanceRole)]
         ))
-

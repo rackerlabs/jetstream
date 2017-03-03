@@ -7,12 +7,12 @@ from setuptools import setup, find_packages
 
 DEPENDENCIES = [
     'troposphere==1.9.2',
-    'boto3==1.4.1',
+    'boto3==1.4.4',
     'awacs',
 ]
 
 STYLE_REQUIRES = [
-    'flak8>=2.5.4',
+    'flake8>=2.5.4',
     'pylint>=1.5.5',
 ]
 
@@ -40,6 +40,7 @@ def package_meta():
         'license': licencia,
         'url': url,
     }
+
 
 _lu_meta = package_meta()
 
