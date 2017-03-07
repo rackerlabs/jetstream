@@ -79,8 +79,16 @@ def _execute(args):
         sys.exit(1)
 
 
+def signal_term_handler(_signal, _frame):
+    '''Exit, throwing SystemExit automatically causing cleanup'''
+    sys.exit(1)
+
+
 def main():
     '''Main function'''
+    import signal
+    signal.signal(signal.SIGTERM, signal_term_handler)
+
     import argparse
 
     parser = argparse.ArgumentParser()
