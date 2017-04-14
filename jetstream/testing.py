@@ -158,7 +158,28 @@ class Test(object):
 
     def _log_failed_stacks(self, stack_name):
         """Log stack events that have FAILED status"""
-        stack_resp = self._client.describe_stacks(StackName=stack_name)
+
+        # log parent stack failures
+        self._log_failed_stack(stack_name)
+
+        # if any child stacks with same prefix, log errors on those too
+        child_stack_resp = self._client.list_stacks()
+        for child_stack_summary in child_stack_resp.get('StackSummaries', []):
+            found_stack_id = child_stack_summary.get('StackId', None)
+
+            if stack_name in found_stack_id:
+                self._log_failed_stack(found_stack_id)
+
+    def _log_failed_stack(self, stack_id):
+        """
+        Log stack events that have FAILED somehow
+        stack_id: name or stack_id of a failed stack
+
+        boto3's describe_stacks() call actually accepts stack name or stack id,
+        depending on the current state of the stack
+        """
+
+        stack_resp = self._client.describe_stacks(StackName=stack_id)
         stack_data = stack_resp['Stacks'][0]
 
         optional_reason = 'No reason found'
@@ -173,11 +194,12 @@ class Test(object):
         LOG.debug("Full trace: %s", str(stack_data))
 
         stack_events_resp = self._client.describe_stack_events(
-            StackName=stack_name)
+            StackName=stack_id)
 
         for e in stack_events_resp['StackEvents']:
             if 'ResourceStatus' in e and 'FAILED' in e['ResourceStatus']:
-                LOG.error("%s: %s",
+                LOG.error("%s - %s: %s",
+                          stack_id,
                           e['EventId'],
                           e['ResourceStatusReason'])
 
