@@ -221,15 +221,16 @@ class JetstreamTemplate(object):
         doc.append(header_text + "\n" + ('=' * len(header_text)))
         doc.append(self.template.description)
         doc.append("Last updated on `{}`\n".format(datetime.now()))
+
         # Parameters
-        doc.append('###Parameters')
+        doc.append('### Parameters')
         for name, param in self.template.parameters.items():
-            doc.append('\n####' + name)
+            doc.append('\n#### ' + name)
             for prop, value in param.properties.items():
                 doc.append("- {}: `{}`".format(prop, value))
 
         # Outputs
-        doc.append('\n###Outputs')
+        doc.append('\n### Outputs')
         for name in self.template.outputs.keys():
             doc.append("- `{}`".format(name))
 
