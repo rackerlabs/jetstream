@@ -127,7 +127,8 @@ class LocalPublisher(object):
                 raise excep
 
             # parse as string, the JSON parser failed
-            existing = open(file_path, 'r').read()
+            with open(file_path, 'r') as fh:
+                existing = fh.read()
             return bool(cmp(latest, existing))
 
         # fall back to saying the files are different
