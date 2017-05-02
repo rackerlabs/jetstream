@@ -37,17 +37,26 @@ def _execute(args):
 
     templates = template.load_templates(args.package)
     updated_templates = []
+    updated_documentation = []
     for _, tmpl in templates.items():
         if publish.newer(tmpl.name, tmpl.generate()):
             updated_templates.append(tmpl)
+
+        if args.document:
+            if publish.newer(tmpl.document_name(), tmpl.document()):
+                updated_documentation.append(tmpl)
     if updated_templates:
         print("Updated Templates: " + ', '.join(
             [t.name for t in updated_templates]))
-    else:
-        print("No updated templates found")
+    if updated_documentation:
+        print("Updated Documentation: " + ', '.join(
+            [t.name for t in updated_documentation]))
+
+    if not updated_templates and not updated_documentation:
+        print("No updated templates or documents found")
         return
 
-    # If the test flag is set then run a test
+    # If the test flag is set and templates have been updated, run a test
     test_passed = True
     if args.test and updated_templates:
         test = testing.Test(updated_templates, dry_run=args.dry_test)
@@ -72,7 +81,9 @@ def _execute(args):
         else:
             for tmpl in updated_templates:
                 publish.publish_file(tmpl.name, tmpl.generate())
-                if args.document:
+
+            if args.document:
+                for tmpl in updated_documentation:
                     publish.publish_file(tmpl.document_name(), tmpl.document())
     else:
         print("Testing Failed :(", file=sys.stderr)
