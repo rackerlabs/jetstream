@@ -109,6 +109,7 @@ class LocalPublisher(object):
         '''
         Compares local file contents with latest
         copy to determine whether anything has changed
+        returns False if files are identical, True otherwise
         '''
         file_path = path.join(self.base_path,
                               name)
@@ -121,6 +122,15 @@ class LocalPublisher(object):
         except IOError as excep:
             if 'No such file or directory:' not in str(excep):
                 raise excep
+        except ValueError as excep:
+            if 'No JSON object could be decoded' not in str(excep):
+                raise excep
+
+            # parse as string, the JSON parser failed
+            existing = open(file_path, 'r').read()
+            return bool(cmp(latest, existing))
+
+        # fall back to saying the files are different
         return True
 
     def publish_file(self, name, contents):

@@ -19,7 +19,6 @@ import collections
 import json
 import copy
 
-from datetime import datetime
 from importlib import import_module
 from troposphere import GetAtt, BaseAWSObject
 
@@ -220,7 +219,6 @@ class JetstreamTemplate(object):
         header_text = "{} FAWS Template".format(self.resource_name())
         doc.append(header_text + "\n" + ('=' * len(header_text)))
         doc.append(self.template.description)
-        doc.append("Last updated on `{}`\n".format(datetime.now()))
 
         # Parameters
         doc.append('### Parameters')
