@@ -64,7 +64,7 @@ class S3Publisher(object):
             body = resp.get('Body')
             body_obj = json.load(body)
             latest_obj = json.loads(latest)
-            return bool(cmp(latest_obj, body_obj))
+            return not _objects_match(latest_obj, body_obj)
         except botocore.exceptions.ClientError as excep:
             if 'specified key does not exist' in str(excep):
                 return True
@@ -117,7 +117,7 @@ class LocalPublisher(object):
             existing = json.load(fil)
             fil.close()
             latest_obj = json.loads(latest)
-            return bool(cmp(latest_obj, existing))
+            return not _objects_match(latest_obj, existing)
         except IOError as excep:
             if 'No such file or directory:' not in str(excep):
                 raise excep
@@ -131,3 +131,37 @@ class LocalPublisher(object):
             return
         with open(file_path, 'w+') as fil:
             fil.write(contents)
+
+
+def _objects_match(original, latest):
+    '''
+    Validate whether two Python objects match.
+
+    For dictionaries it will verify that objects match even if
+    dictionaries are unordered.
+    '''
+
+    # If types do not match then the objects do not
+    # match
+    if not isinstance(original, type(latest)):
+        return False
+
+    if isinstance(original, dict):
+        u_keys = set(original.keys()).symmetric_difference(set(latest.keys()))
+        if len(u_keys) > 0:
+            return False
+
+        for key in original.keys():
+            if not _objects_match(original[key], latest[key]):
+                return False
+
+        return True
+    if isinstance(original, (tuple, list)):
+        if len(original) != len(latest):
+            return False
+        for i in range(0, len(original)-1):
+            if not _objects_match(original[i], latest[i]):
+                return False
+        return True
+    else:
+        return original == latest
