@@ -39,7 +39,7 @@ def _execute(args):
     updated_templates = []
     updated_documentation = []
     for _, tmpl in templates.items():
-        if publish.newer(tmpl.name, tmpl.generate(format=args.format)):
+        if publish.newer(tmpl.name, tmpl.generate(fmt=args.format)):
             updated_templates.append(tmpl)
 
         if args.document:
@@ -82,7 +82,7 @@ def _execute(args):
             for tmpl in updated_templates:
                 publish.publish_file(
                     tmpl.name,
-                    tmpl.generate(format=args.format)
+                    tmpl.generate(fmt=args.format)
                 )
 
             if args.document:
@@ -145,6 +145,7 @@ def main():
                         default=False)
     parser.add_argument('--format', '-f', dest='format',
                         help='json or yaml format',
+                        choices=['json', 'yaml'],
                         default='json')
 
     test_conditions = ['never', 'failure', 'pass']

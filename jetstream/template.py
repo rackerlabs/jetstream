@@ -255,21 +255,15 @@ class JetstreamTemplate(object):
                     pass
 
         try:
-            if fmt == 'json':
-                # Handle JSON.dumps failing
-                encoded_template = json.dumps(
-                    tmpl.to_dict(),
-                    sort_keys=False, indent=2,
-                    separators=(',', ': '),
-                    cls=JetstreamEncoder)
-            elif fmt == 'yaml':
-                encoded_template = cfn_flip.to_yaml(json.dumps(
-                    tmpl.to_dict(),
-                    sort_keys=False, indent=2,
-                    separators=(',', ': '),
-                    cls=JetstreamEncoder))
-            else:
-                raise RuntimeError('unrecognized format {}'.format(fmt))
+            # Handle JSON.dumps failing
+            encoded_template = json.dumps(
+                tmpl.to_dict(),
+                sort_keys=False, indent=2,
+                separators=(',', ': '),
+                cls=JetstreamEncoder)
+
+            if fmt == 'yaml':
+                encoded_template = cfn_flip.to_yaml(encoded_template)
 
             return encoded_template
         except:
