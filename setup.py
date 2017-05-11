@@ -9,6 +9,7 @@ DEPENDENCIES = [
     'troposphere==1.9.3',
     'boto3==1.4.4',
     'awacs',
+    'cfn_flip'
 ]
 
 STYLE_REQUIRES = [

@@ -3,3 +3,4 @@ pyyaml
 awscli
 boto
 awacs
+cfn_flip

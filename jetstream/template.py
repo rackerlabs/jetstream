@@ -21,6 +21,7 @@ import copy
 
 from importlib import import_module
 from troposphere import GetAtt, BaseAWSObject
+import cfn_flip
 
 
 def load_template(package, template):
@@ -234,7 +235,7 @@ class JetstreamTemplate(object):
 
         return "\n".join(doc)
 
-    def generate(self, testing=False):
+    def generate(self, testing=False, fmt='json'):
         '''Returns the generated cf template'''
         self.prepare_generate()  # prepare template
 
@@ -260,6 +261,9 @@ class JetstreamTemplate(object):
                 sort_keys=False, indent=2,
                 separators=(',', ': '),
                 cls=JetstreamEncoder)
+
+            if fmt == 'yaml':
+                encoded_template = cfn_flip.to_yaml(encoded_template)
 
             return encoded_template
         except:
