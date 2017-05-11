@@ -39,7 +39,7 @@ def _execute(args):
     updated_templates = []
     updated_documentation = []
     for _, tmpl in templates.items():
-        if publish.newer(tmpl.name, tmpl.generate()):
+        if publish.newer(tmpl.name, tmpl.generate(format=args.format)):
             updated_templates.append(tmpl)
 
         if args.document:
@@ -80,7 +80,10 @@ def _execute(args):
             print("No publish set ... not publishing")
         else:
             for tmpl in updated_templates:
-                publish.publish_file(tmpl.name, tmpl.generate())
+                publish.publish_file(
+                    tmpl.name,
+                    tmpl.generate(format=args.format)
+                )
 
             if args.document:
                 for tmpl in updated_documentation:
@@ -140,6 +143,9 @@ def main():
     parser.add_argument('--public', action='store_true',
                         help='Whether S3 Published documents should be public',
                         default=False)
+    parser.add_argument('--format', '-f', dest='format',
+                        help='json or yaml format',
+                        default='json')
 
     test_conditions = ['never', 'failure', 'pass']
     cleanup_help = "Test condition to cleanup ({}) defaults to pass".format(
