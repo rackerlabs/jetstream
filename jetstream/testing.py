@@ -51,11 +51,31 @@ class Test(object):
             self._client = boto3.client('cloudformation')
             self.publisher = S3Publisher("s3://" + self._bucket, public=False)
 
+    def __get_region_from_env(self):
+        """
+        Retrieve region from a few reasonable environment variables. Mainly
+        used with S3 to set the LocationConstraint when creating buckets
+
+        :return: Either the region defined in the environment variable or False
+        """
+        for region_env in ["AWS_DEFAULT_REGION", "DEFAULT_REGION", "REGION"]:
+            region = os.environ.get(region_env)
+            if region:
+                return region
+
+        return False
+
     def run(self):
         '''Run the test'''
         if not self._dry_run:
             LOG.info("Creating bucket %s", self._bucket)
-            boto3.client('s3').create_bucket(Bucket=self._bucket)
+            region = self.__get_region_from_env()
+            if region:
+                boto3.client('s3').create_bucket(
+                    Bucket=self._bucket,
+                    CreateBucketConfiguration={'LocationConstraint': region})
+            else:
+                boto3.client('s3').create_bucket(Bucket=self._bucket)
             LOG.info("Bucket %s created", self._bucket)
 
         LOG.info("Uploading files")
