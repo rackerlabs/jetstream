@@ -1,4 +1,4 @@
-# Copyright 2016 Rackspace US, Inc.
+# Copyright 2017 Rackspace US, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,5 +17,5 @@
 __title__ = 'jetstream'
 __version__ = '0.1.0'
 __license__ = 'Apache 2.0'
-__copyright__ = 'Copyright Rackspace US, Inc. 2016'
+__copyright__ = 'Copyright Rackspace US, Inc. 2017'
 __url__ = 'https://rackspace.com/rackerlabs/jetstream'
