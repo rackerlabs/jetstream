@@ -118,7 +118,7 @@ test_params.add(TestParameter('S3Bucket', 'Arn', S3Bucket()))
 ```
 
 Jetstream can handle multi-level template dependencies so the following
-a legal dependency chain. Circular dependencies however will not work
+is a legal dependency chain. Circular dependencies however will not work
 and will cause the test to fail during CloudFormation creation.
 
 A depends on B which depends on C which depends on D, B also depends on D.
