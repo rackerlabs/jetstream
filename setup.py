@@ -8,7 +8,6 @@ from setuptools import setup, find_packages
 DEPENDENCIES = [
     'troposphere==1.9.6',
     'boto3==1.4.4',
-    'awacs',
     'cfn_flip'
 ]
 
