@@ -6,7 +6,7 @@ import re
 from setuptools import setup, find_packages
 
 DEPENDENCIES = [
-    'troposphere==2.0.1',
+    'troposphere>=2.0.2',
     'boto3==1.4.4',
     'cfn_flip'
 ]
