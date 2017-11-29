@@ -2,4 +2,4 @@ troposphere>=2.1.0
 pyyaml
 awscli
 boto
-cfn_flip
+cfn_flip==0.2.5

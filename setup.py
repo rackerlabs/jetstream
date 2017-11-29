@@ -7,8 +7,8 @@ from setuptools import setup, find_packages
 
 DEPENDENCIES = [
     'troposphere>=2.1.0',
-    'boto3==1.4.4',
-    'cfn_flip'
+    'boto3==1.4.8',
+    'cfn_flip==0.2.5'
 ]
 
 STYLE_REQUIRES = [
