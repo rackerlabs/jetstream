@@ -24,6 +24,11 @@ from troposphere import GetAtt, BaseAWSObject
 import cfn_flip
 from . import TOPLEVEL_METADATA_KEY
 
+try:
+  basestring
+except NameError:
+  basestring = str
+
 
 def load_template(package, template):
     '''
@@ -37,7 +42,7 @@ def load_template(package, template):
     except:  # noqa
         _, excep, trace = sys.exc_info()
         message = "Failed to load template %s: %s" % (template, str(excep))
-        raise RuntimeError, message, trace
+        raise RuntimeError(message, trace)
 
 
 def load_templates(package):
@@ -288,7 +293,7 @@ class JetstreamTemplate(object):
             class_name = type(self).__name__
             message = "Failed to build JSON for template %s: %s" \
                 % (class_name, str(excep))
-            raise RuntimeError, message, trace
+            raise RuntimeError(message, trace)
 
 
 TOP_LEVEL_DICT_ORDER = [
