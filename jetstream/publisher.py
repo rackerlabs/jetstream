@@ -14,12 +14,13 @@
 
 '''Code to publish the CloudFormationstemplates'''
 
+import collections
 import json
 import re
-import os
-import collections
-from os import path
 from logging import getLogger
+
+import os
+from os import path
 
 import boto3
 import botocore
@@ -184,15 +185,16 @@ def _sort_dict(dikt):
     '''Recursively sort dict'''
     for key in dikt.keys():
         if isinstance(dikt[key], dict):
-           dikt[key] = _sort_dict(dikt[key])
+            dikt[key] = _sort_dict(dikt[key])
 
     return collections.OrderedDict(sorted(dikt.items()))
 
 
 def _updated(a, b):
+    '''See if dict updated'''
     if not isinstance(a, type(b)):
         return True
     if isinstance(a, dict):
-        return not _sort_dict(a) == _sort_dict(b)
+        return _sort_dict(a) != _sort_dict(b)
 
     return not a == b

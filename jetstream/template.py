@@ -25,9 +25,9 @@ import cfn_flip
 from . import TOPLEVEL_METADATA_KEY
 
 try:
-  basestring
+    basestring
 except NameError:
-  basestring = str
+    basestring = str
 
 
 def load_template(package, template):
