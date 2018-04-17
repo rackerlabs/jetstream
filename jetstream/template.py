@@ -27,7 +27,7 @@ from . import TOPLEVEL_METADATA_KEY
 try:
     basestring
 except NameError:
-    basestring = str
+    basestring = str  # pylint: disable=W0622
 
 
 def load_template(package, template):
