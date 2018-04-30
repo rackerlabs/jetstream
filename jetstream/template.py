@@ -33,7 +33,7 @@ def load_template(package, template):
         imported_module = import_module("{}.{}".format(package, module))
         template_object = getattr(imported_module, template_class)()
         return template_object
-    except:
+    except:  # noqa
         _, excep, trace = sys.exc_info()
         message = "Failed to load template %s: %s" % (template, str(excep))
         raise RuntimeError, message, trace
@@ -189,7 +189,8 @@ class JetstreamTemplate(object):
         '''Validate that required attrs were set in a template'''
         for attr in attrs:
             if not hasattr(self, attr) or getattr(self, attr) is None:
-                raise Exception("Missing required template attribute " + attr)
+                raise Exception("Missing required template attribute %s for %s"
+                                % (attr, type(self).__name__))
 
     def _default_attr(self, name, default):
         '''Set default attrs if they dont exist'''
@@ -266,7 +267,7 @@ class JetstreamTemplate(object):
                 encoded_template = cfn_flip.to_yaml(encoded_template)
 
             return encoded_template
-        except:
+        except: # noqa
             _, excep, trace = sys.exc_info()
             class_name = type(self).__name__
             message = "Failed to build JSON for template %s: %s" \
