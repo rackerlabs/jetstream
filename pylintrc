@@ -6,6 +6,7 @@ disable=
   invalid-name,
   too-many-branches,
   redefined-variable-type,
+  too-many-statements,
   no-self-use, ; Temporary
   fixme, ; Temporary
   duplicate-code,  ; Remove once #8 is resolved
