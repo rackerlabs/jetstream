@@ -39,7 +39,12 @@ def _execute(args):
     updated_templates = []
     updated_documentation = []
     for _, tmpl in templates.items():
-        if publish.newer(tmpl.name, tmpl.generate(fmt=args.format)):
+        template_name = tmpl.name
+        # Add extension to template name if flag set
+        if args.extension:
+            template_name += '.' + args.format
+
+        if publish.newer(template_name, tmpl.generate(fmt=args.format)):
             updated_templates.append(tmpl)
 
         if args.document:
@@ -80,8 +85,13 @@ def _execute(args):
             print("No publish set ... not publishing")
         else:
             for tmpl in updated_templates:
+                template_name = tmpl.name
+                # Add extension to template name if flag set
+                if args.extension:
+                    template_name += '.' + args.format
+
                 publish.publish_file(
-                    tmpl.name,
+                    template_name,
                     tmpl.generate(fmt=args.format)
                 )
 
@@ -147,6 +157,10 @@ def main():
                         help='json or yaml format',
                         choices=['json', 'yaml'],
                         default='json')
+    parser.add_argument('--extension', '-e', dest='extension',
+                        help='Append the format extension to the template name.',
+                        action='store_true',
+                        default=False)
 
     test_conditions = ['never', 'failure', 'pass']
     cleanup_help = "Test condition to cleanup ({}) defaults to pass".format(
