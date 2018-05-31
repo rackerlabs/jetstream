@@ -158,7 +158,8 @@ def main():
                         choices=['json', 'yaml'],
                         default='json')
     parser.add_argument('--extension', '-e', dest='extension',
-                        help='Append the format extension to the template name.',
+                        help=('Append the format extension to '
+                              'the template name.'),
                         action='store_true',
                         default=False)
 
