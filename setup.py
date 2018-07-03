@@ -6,9 +6,8 @@ import re
 from setuptools import setup, find_packages
 
 DEPENDENCIES = [
-    'troposphere>=2.1.0',
+    'troposphere>=2.3.1',
     'boto3==1.4.8',
-    'cfn_flip==0.2.5'
 ]
 
 STYLE_REQUIRES = [
