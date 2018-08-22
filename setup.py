@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 DEPENDENCIES = [
     'troposphere>=2.3.1',
-    'boto3==1.4.8',
+    'boto3>=1.4.8',
 ]
 
 STYLE_REQUIRES = [
