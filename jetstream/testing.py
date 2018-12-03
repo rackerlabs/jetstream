@@ -15,11 +15,10 @@
 '''Testing module'''
 
 import time
-import os
 import string
 import random
 
-from os import path
+from os import path, getcwd, environ
 from logging import getLogger
 from troposphere import Template
 from troposphere.cloudformation import Stack
@@ -55,7 +54,7 @@ class Test(object):
 
         if self._dry_run:
             self.publisher = LocalPublisher(
-                path.join(os.getcwd(), self._bucket))
+                path.join(getcwd(), self._bucket))
         else:
             self._client = boto3.client('cloudformation')
             self.publisher = S3Publisher("s3://" + self._bucket, public=False)
@@ -68,7 +67,7 @@ class Test(object):
         :return: Either the region defined in the environment variable or False
         """
         for region_env in ["AWS_DEFAULT_REGION", "DEFAULT_REGION", "REGION"]:
-            region = os.environ.get(region_env)
+            region = environ.get(region_env)
             if region:
                 return region
 
@@ -97,10 +96,10 @@ class Test(object):
 
         if self._dry_run:
             return True
-        else:
-            LOG.info("Creating stack %s...", self._stack_name)
-            self._build_stack()
-            return self._wait_results(self._stack_name)
+
+        LOG.info("Creating stack %s...", self._stack_name)
+        self._build_stack()
+        return self._wait_results(self._stack_name)
 
     def cleanup(self):
         '''Clean up the testing stack and bucket'''
@@ -166,7 +165,7 @@ class Test(object):
             template_url = "{}/{}".format(self._bucket_url,
                                           templ.name)
             # Create a test template for every set of test parameters
-            if len(templ.get_test_parameter_groups()) == 0:
+            if not templ.get_test_parameter_groups():
                 stack_params = {}
                 stack_params['TemplateURL'] = template_url
                 stack_name = templ.resource_name() + 'Default'
