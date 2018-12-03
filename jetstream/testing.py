@@ -16,6 +16,8 @@
 
 import time
 import os
+import string
+import random
 
 from os import path
 from logging import getLogger
@@ -38,8 +40,15 @@ class Test(object):
     '''
     def __init__(self, templates, dry_run=False):
         self.templates = _flatten_templates(templates)
-        timestamp = int(time.time())
-        self._bucket = "jetstream-test-{}".format(timestamp)
+
+        # S3 bucket names have to be globally unique. This helps ensure as much
+        # randomness as possible by mixing the current time in detail with an
+        # additional random string
+        timestamp = time.strftime('%Y%m%d%H%M%S', time.gmtime())
+        suffix = ''.join(
+            random.SystemRandom().choice(
+                string.ascii_lowercase + string.digits) for _ in range(10))
+        self._bucket = "jetstream-test-{}-{}".format(timestamp, suffix)
         self._stack_name = "JetstreamTest{}".format(timestamp)
         self._bucket_url = "https://s3.amazonaws.com/{}".format(self._bucket)
         self._dry_run = dry_run
