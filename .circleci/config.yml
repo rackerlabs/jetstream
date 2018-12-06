@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  python2_test:
+    docker:
+      - image: circleci/python:2.7.15
+    steps:
+      - run: mkdir ~/repo
+      - checkout:
+          path: ~/repo/
+      - run: virtualenv ~/repo/venv
+      - run: echo "source ~/repo/venv/bin/activate" >> $BASH_ENV
+      - run: pip install --upgrade pip
+      - run: pip install -U tox
+      - run: cd ~/repo && tox -v
+workflows:
+  version: 2
+  build:
+    jobs:
+      - python2_test
