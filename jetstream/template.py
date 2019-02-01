@@ -250,10 +250,7 @@ class JetstreamTemplate(object):
             # but do not want to affect the original.
             tmpl = copy.deepcopy(self.template)
             for _, resource in tmpl.resources.items():
-                try:
-                    resource.resource.pop('DeletionPolicy')
-                except KeyError:
-                    pass
+                resource.resource['DeletionPolicy'] = 'Delete'
 
         try:
             # Handle JSON.dumps failing
