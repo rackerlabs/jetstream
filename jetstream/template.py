@@ -22,6 +22,7 @@ import copy
 from importlib import import_module
 from troposphere import GetAtt, BaseAWSObject
 import cfn_flip
+from . import TOPLEVEL_METADATA_KEY
 
 
 def load_template(package, template):
@@ -236,7 +237,18 @@ class JetstreamTemplate(object):
 
         return "\n".join(doc)
 
-    def generate(self, testing=False, fmt='json'):
+    @staticmethod
+    def __generate_metadata(additional_metadata=None):
+        """Add additional template metadata provided by CLI args"""
+        jetstream_metadata = {}
+        if additional_metadata:
+            for kv_pair in additional_metadata:
+                k, v = kv_pair.split('=')
+                jetstream_metadata[k] = v
+
+        return jetstream_metadata
+
+    def generate(self, testing=False, fmt='json', additional_metadata=None):
         '''Returns the generated cf template'''
         self.prepare_generate()  # prepare template
 
@@ -253,6 +265,13 @@ class JetstreamTemplate(object):
                 resource.resource['DeletionPolicy'] = 'Delete'
 
         try:
+            if additional_metadata:
+                jetstream_metadata = self.__generate_metadata(
+                    additional_metadata)
+
+                if jetstream_metadata:
+                    tmpl.metadata[TOPLEVEL_METADATA_KEY] = jetstream_metadata
+
             # Handle JSON.dumps failing
             encoded_template = json.dumps(
                 tmpl.to_dict(),

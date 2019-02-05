@@ -23,9 +23,38 @@ from logging import getLogger
 import boto3
 import botocore
 
+from . import TOPLEVEL_METADATA_KEY
+
 LOG = getLogger(__name__)
 
 BUCKET_REGEX = r"^s3://([a-zA-Z0-9\_\-\.]+)/?([a-zA-Z0-9\_\-\.\/]+)?"
+
+
+def remove_metadata(current_template, new_template):
+    """
+    Remove toplevel metadata key before comparison. This will
+    contain items which are generally random generation such
+    as version numbers and document hashes, but are not considered
+    to be affect the template's functionality.
+
+    :param current_template: The existing template dictionary data
+    :param new_template: The new template dictionary data
+    """
+    if 'Metadata' in current_template.keys()\
+            and TOPLEVEL_METADATA_KEY in current_template['Metadata'].keys():
+        del current_template['Metadata'][TOPLEVEL_METADATA_KEY]
+    if 'Metadata' in new_template.keys()\
+            and TOPLEVEL_METADATA_KEY in new_template['Metadata'].keys():
+        del new_template['Metadata'][TOPLEVEL_METADATA_KEY]
+
+    # If the existing template has no Metadata sections, the empty Metadata
+    # section after removal of the Jetstream subsection would proc an update
+    # due to the difference in Metadata section present versus lack of.
+    # To avoid this Metadata section also gets removed if Jetstream subsection
+    # was the only part of it.
+    if 'Metadata' not in current_template.keys():
+        if not new_template['Metadata'].keys():
+            del new_template['Metadata']
 
 
 class S3Publisher(object):
@@ -64,6 +93,7 @@ class S3Publisher(object):
             body = resp.get('Body')
             body_obj = json.load(body)
             latest_obj = json.loads(latest)
+            remove_metadata(body_obj, latest_obj)
             return bool(cmp(latest_obj, body_obj))
         except botocore.exceptions.ClientError as excep:
             if 'specified key does not exist' in str(excep):
@@ -118,7 +148,9 @@ class LocalPublisher(object):
             existing = json.load(fil)
             fil.close()
             latest_obj = json.loads(latest)
+            remove_metadata(existing, latest_obj)
             return bool(cmp(latest_obj, existing))
+
         except IOError as excep:
             if 'No such file or directory:' not in str(excep):
                 raise excep
