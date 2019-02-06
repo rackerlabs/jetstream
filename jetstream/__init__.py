@@ -19,3 +19,5 @@ __version__ = '0.1.0'
 __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright Rackspace US, Inc. 2017'
 __url__ = 'https://rackspace.com/rackerlabs/jetstream'
+
+TOPLEVEL_METADATA_KEY = 'Jetstream'

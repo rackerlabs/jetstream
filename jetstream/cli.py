@@ -44,7 +44,9 @@ def _execute(args):
         if args.extension:
             template_name += '.' + args.format
 
-        if publish.newer(template_name, tmpl.generate(fmt=args.format)):
+        if publish.newer(template_name, tmpl.generate(
+                fmt=args.format,
+                additional_metadata=args.additional_metadata)):
             updated_templates.append(tmpl)
 
         if args.document:
@@ -92,7 +94,8 @@ def _execute(args):
 
                 publish.publish_file(
                     template_name,
-                    tmpl.generate(fmt=args.format)
+                    tmpl.generate(fmt=args.format,
+                                  additional_metadata=args.additional_metadata)
                 )
 
             if args.document:
@@ -150,6 +153,14 @@ def main():
                         help='Do not publish CloudFormation results',
                         action='store_true',
                         default=False)
+    parser.add_argument('--metadata', '-M',
+                        dest='additional_metadata',
+                        help='Add dynamic metadata under a Jetstream key which'
+                             'is ignored for comparison purposes. This can be '
+                             'used for version numbers, date stamp, hash '
+                             'values, etc. Value is the form "key=value".',
+                        action='append',
+                        default=[])
     parser.add_argument('--public', action='store_true',
                         help='Whether S3 Published documents should be public',
                         default=False)
