@@ -40,11 +40,11 @@ def remove_metadata(current_template, new_template):
     :param current_template: The existing template dictionary data
     :param new_template: The new template dictionary data
     """
-    if 'Metadata' in current_template.keys()\
-            and TOPLEVEL_METADATA_KEY in current_template['Metadata'].keys():
+    if 'Metadata' in list(current_template.keys())\
+            and TOPLEVEL_METADATA_KEY in list(current_template['Metadata'].keys()):
         del current_template['Metadata'][TOPLEVEL_METADATA_KEY]
-    if 'Metadata' in new_template.keys()\
-            and TOPLEVEL_METADATA_KEY in new_template['Metadata'].keys():
+    if 'Metadata' in list(new_template.keys())\
+            and TOPLEVEL_METADATA_KEY in list(new_template['Metadata'].keys()):
         del new_template['Metadata'][TOPLEVEL_METADATA_KEY]
 
     # If the existing template has no Metadata sections, the empty Metadata
@@ -52,8 +52,8 @@ def remove_metadata(current_template, new_template):
     # due to the difference in Metadata section present versus lack of.
     # To avoid this Metadata section also gets removed if Jetstream subsection
     # was the only part of it.
-    if 'Metadata' not in current_template.keys():
-        if not new_template['Metadata'].keys():
+    if 'Metadata' not in list(current_template.keys()):
+        if not list(new_template['Metadata'].keys()):
             del new_template['Metadata']
 
 
@@ -94,7 +94,7 @@ class S3Publisher(object):
             body_obj = json.load(body)
             latest_obj = json.loads(latest)
             remove_metadata(body_obj, latest_obj)
-            return bool(cmp(latest_obj, body_obj))
+            return latest_obj == body_obj
         except botocore.exceptions.ClientError as excep:
             if 'specified key does not exist' in str(excep):
                 return True
@@ -149,7 +149,7 @@ class LocalPublisher(object):
             fil.close()
             latest_obj = json.loads(latest)
             remove_metadata(existing, latest_obj)
-            return bool(cmp(latest_obj, existing))
+            return latest_obj == existing
 
         except IOError as excep:
             if 'No such file or directory:' not in str(excep):
@@ -161,7 +161,7 @@ class LocalPublisher(object):
             # parse as string, the JSON parser failed
             with open(file_path, 'r') as fh:
                 existing = fh.read()
-            return bool(cmp(latest, existing))
+            return latest == existing
 
         # fall back to saying the files are different
         return True

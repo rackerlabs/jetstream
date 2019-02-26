@@ -13,7 +13,6 @@
 # limitations under the License.
 
 '''Jetstream Command Line Interface'''
-from __future__ import print_function
 from os import path
 
 import sys
@@ -102,7 +101,7 @@ def _execute(args):
                 for tmpl in updated_documentation:
                     publish.publish_file(tmpl.document_name(), tmpl.document())
     else:
-        print("Testing Failed :(", file=sys.stderr)
+        sys.stderr.write('Testing Failed :(\n')
         sys.exit(1)
 
 

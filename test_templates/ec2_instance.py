@@ -21,7 +21,7 @@ from troposphere import Parameter, Ref, Tags, Template
 from troposphere.ec2 import Instance
 from troposphere.iam import InstanceProfile, Role, Policy
 
-from s3_bucket import S3Bucket
+from .s3_bucket import S3Bucket
 
 
 class EC2Instance(JetstreamTemplate):

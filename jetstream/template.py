@@ -15,6 +15,7 @@
 '''Template Class to be overridden by Template'''
 
 import sys
+import os
 import collections
 import json
 import copy
@@ -37,7 +38,7 @@ def load_template(package, template):
     except:  # noqa
         _, excep, trace = sys.exc_info()
         message = "Failed to load template %s: %s" % (template, str(excep))
-        raise RuntimeError, message, trace
+        raise RuntimeError(message).with_traceback(trace)
 
 
 def load_templates(package):
@@ -46,11 +47,17 @@ def load_templates(package):
     returns a map of loaded template objects
     '''
     template_objects = {}
+
+    saved_path = sys.path
+    sys.path.insert(0, os.getcwd())
+
     imported_module = import_module(package)
 
     for template in imported_module.templates:
         template_object = load_template(package, template)
         template_objects[template_object.name] = template_object
+
+    sys.path = saved_path
 
     return template_objects
 
@@ -65,7 +72,7 @@ class TestParameter(object):
         else:
             self._name = name
 
-        if not isinstance(value, basestring):
+        if not isinstance(value, str):
             s = "TestParameter value must be of type string, not {}".format(
                 str(type(value))
             )
@@ -127,7 +134,7 @@ class TestParameterGroup(object):
             if source:
                 deps[source.name] = source
 
-        return deps.values()
+        return list(deps.values())
 
 
 class TestParameterGroups(object):
@@ -288,7 +295,7 @@ class JetstreamTemplate(object):
             class_name = type(self).__name__
             message = "Failed to build JSON for template %s: %s" \
                 % (class_name, str(excep))
-            raise RuntimeError, message, trace
+            raise RuntimeError(message).with_traceback(trace)
 
 
 TOP_LEVEL_DICT_ORDER = [
