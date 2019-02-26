@@ -154,7 +154,7 @@ class Test(object):
         self._client.create_stack(
             StackName=self._stack_name,
             TemplateURL=parent_templ,
-            Capabilities=['CAPABILITY_IAM'])
+            Capabilities=['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM'])
 
     def parent_template(self):
         '''
