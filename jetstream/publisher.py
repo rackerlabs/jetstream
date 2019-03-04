@@ -166,6 +166,7 @@ class LocalPublisher(object):
             # parse as string, the JSON parser failed
             with open(file_path, 'r') as fh:
                 existing = fh.read()
+
             return _updated(latest, existing)
 
         # fall back to saying the files are different
