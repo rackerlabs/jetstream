@@ -273,7 +273,7 @@ class JetstreamTemplate(object):
                 jetstream_metadata = self.__generate_metadata(
                     additional_metadata)
 
-                if jetstream_metadata:
+                if jetstream_metadata and 'Metadata' in tmpl.keys():
                     tmpl['Metadata'][TOPLEVEL_METADATA_KEY] = \
                         jetstream_metadata
 

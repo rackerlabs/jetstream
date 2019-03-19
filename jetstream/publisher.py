@@ -55,7 +55,8 @@ def remove_metadata(current_template, new_template):
     # To avoid this Metadata section also gets removed if Jetstream subsection
     # was the only part of it.
     if 'Metadata' not in current_template.keys():
-        if not new_template['Metadata'].keys():
+        if 'Metadata' in new_template.keys() and \
+                not new_template['Metadata'].keys():
             del new_template['Metadata']
 
 
