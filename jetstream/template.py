@@ -17,12 +17,16 @@
 import sys
 import collections
 import json
-import copy
 
 from importlib import import_module
 from troposphere import GetAtt, BaseAWSObject
 import cfn_flip
 from . import TOPLEVEL_METADATA_KEY
+
+try:
+    basestring
+except NameError:
+    basestring = str  # pylint: disable=W0622
 
 
 def load_template(package, template):
@@ -37,7 +41,7 @@ def load_template(package, template):
     except:  # noqa
         _, excep, trace = sys.exc_info()
         message = "Failed to load template %s: %s" % (template, str(excep))
-        raise RuntimeError, message, trace
+        raise RuntimeError(message, trace)
 
 
 def load_templates(package):
@@ -255,26 +259,27 @@ class JetstreamTemplate(object):
         # validation steps and proper resource name
         self._required_attrs(['template', 'name'])
 
-        tmpl = self.template
+        # We are going to modify this template during testing
+        # but do not want to affect the original.
+        tmpl = self.template.to_dict()
+
         # Remove DeletionPolicies for templates during testing
         if testing:
-            # We are going to modify this template during testing
-            # but do not want to affect the original.
-            tmpl = copy.deepcopy(self.template)
-            for _, resource in tmpl.resources.items():
-                resource.resource['DeletionPolicy'] = 'Delete'
+            for _, resource in tmpl['Resources'].items():
+                resource['DeletionPolicy'] = 'Delete'
 
         try:
             if additional_metadata:
                 jetstream_metadata = self.__generate_metadata(
                     additional_metadata)
 
-                if jetstream_metadata:
-                    tmpl.metadata[TOPLEVEL_METADATA_KEY] = jetstream_metadata
+                if jetstream_metadata and 'Metadata' in tmpl.keys():
+                    tmpl['Metadata'][TOPLEVEL_METADATA_KEY] = \
+                        jetstream_metadata
 
             # Handle JSON.dumps failing
             encoded_template = json.dumps(
-                tmpl.to_dict(),
+                tmpl,
                 sort_keys=False, indent=2,
                 separators=(',', ': '),
                 cls=JetstreamEncoder)
@@ -288,7 +293,7 @@ class JetstreamTemplate(object):
             class_name = type(self).__name__
             message = "Failed to build JSON for template %s: %s" \
                 % (class_name, str(excep))
-            raise RuntimeError, message, trace
+            raise RuntimeError(message, trace)
 
 
 TOP_LEVEL_DICT_ORDER = [

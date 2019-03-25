@@ -14,11 +14,13 @@
 
 '''Code to publish the CloudFormationstemplates'''
 
+import collections
 import json
 import re
+from logging import getLogger
+
 import os
 from os import path
-from logging import getLogger
 
 import boto3
 import botocore
@@ -53,7 +55,8 @@ def remove_metadata(current_template, new_template):
     # To avoid this Metadata section also gets removed if Jetstream subsection
     # was the only part of it.
     if 'Metadata' not in current_template.keys():
-        if not new_template['Metadata'].keys():
+        if 'Metadata' in new_template.keys() and \
+                not new_template['Metadata'].keys():
             del new_template['Metadata']
 
 
@@ -93,8 +96,10 @@ class S3Publisher(object):
             body = resp.get('Body')
             body_obj = json.load(body)
             latest_obj = json.loads(latest)
+
             remove_metadata(body_obj, latest_obj)
-            return bool(cmp(latest_obj, body_obj))
+            return _updated(latest_obj, body_obj)
+
         except botocore.exceptions.ClientError as excep:
             if 'specified key does not exist' in str(excep):
                 return True
@@ -148,8 +153,9 @@ class LocalPublisher(object):
             existing = json.load(fil)
             fil.close()
             latest_obj = json.loads(latest)
+
             remove_metadata(existing, latest_obj)
-            return bool(cmp(latest_obj, existing))
+            return _updated(latest_obj, existing)
 
         except IOError as excep:
             if 'No such file or directory:' not in str(excep):
@@ -161,7 +167,8 @@ class LocalPublisher(object):
             # parse as string, the JSON parser failed
             with open(file_path, 'r') as fh:
                 existing = fh.read()
-            return bool(cmp(latest, existing))
+
+            return _updated(latest, existing)
 
         # fall back to saying the files are different
         return True
@@ -174,3 +181,22 @@ class LocalPublisher(object):
             return
         with open(file_path, 'w+') as fil:
             fil.write(contents)
+
+
+def _sort_dict(dikt):
+    '''Recursively sort dict'''
+    for key in dikt.keys():
+        if isinstance(dikt[key], dict):
+            dikt[key] = _sort_dict(dikt[key])
+
+    return collections.OrderedDict(sorted(dikt.items()))
+
+
+def _updated(a, b):
+    '''See if dict updated'''
+    if not isinstance(a, type(b)):
+        return True
+    if isinstance(a, dict):
+        return _sort_dict(a) != _sort_dict(b)
+
+    return not a == b
