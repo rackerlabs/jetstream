@@ -10,7 +10,8 @@ jobs:
       - run: virtualenv ~/repo/venv
       - run: echo "source ~/repo/venv/bin/activate" >> $BASH_ENV
       - run: pip install --upgrade pip
-      - run: pip install -U tox tox-venv
+      - run: pip install 'tox==3.5.0'
+      - run: pip install tox-venv
       - run: cd ~/repo && tox -v
 workflows:
   version: 2
