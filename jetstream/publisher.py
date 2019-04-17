@@ -160,10 +160,9 @@ class LocalPublisher(object):
         except IOError as excep:
             if 'No such file or directory:' not in str(excep):
                 raise excep
+        # ValueError works for both python 2 and 3 as the python 3 JSON
+        # decoder exception class is a subclass of ValueError
         except ValueError as excep:
-            if 'No JSON object could be decoded' not in str(excep):
-                raise excep
-
             # parse as string, the JSON parser failed
             with open(file_path, 'r') as fh:
                 existing = fh.read()
