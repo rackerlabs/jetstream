@@ -1,5 +1,5 @@
-Jetstream
-=========
+# Jetstream
+
 Jetstream is a wrapper project around Troposphere to create and maintain
 CloudFormation templates for AWS. This tools uses the awesome project
 Troposphere to allow us to write out CF templates in Python and provides
@@ -12,40 +12,41 @@ Features that are available with Jetstream and Troposphere:
 - Builds out full tests only on changed templates and dependencies (Jetstream)
 - Is able to publish to S3 and to a Local File System (Jetstream)
 
-###Setup
-To install Jetstream from Pypi:
-```shell
-pip install jetstream
-```
+## Setup
 
 To install Jetstream from git you need to clone down the repository and
 pip install.
 
 ```shell
 git clone git@github.com:rackerlabs/jetstream
-cd jetstream && pip -e install .
+cd jetstream && pip install -e .
 ```
 
-###Building
+## Building
+
 To build templates from a Python Package of templates
 run `jetstream -m <python_package>`.
 
 This will put the resulting templates in a directory named artifacts
 in your CWD.
+
 ```shell
 jetstream -m 'my_templates_package'
 ```
 
 If you would like the templates to be tested before being generated.
+
 ```shell
 jetstream -t
 ```
 
-###Templates
+## Templates
+
 Every template starts out as a new Object inherited from the JetstreamTemplate
 class.
 
 Example S3 Template
+
 ```python
 import time
 
@@ -88,12 +89,14 @@ class S3Bucket(JetstreamTemplate):
         )))
 ```
 
-####Testing
+## Testing
+
 Templates provide you with options when it comes to what to set
 during creation of a test stack using the test_params attribute.
 
 For example to create a unique bucket name for a test of an
 S3 Bucket:
+
 ```python
 bucket_name = self.template.add_parameter(Parameter(
     'BucketName',
@@ -106,6 +109,7 @@ test_params.add(TestParameter('BucketName', test_bucket_name))
 
 Test Parameters also allow you to specify output from a
 different stack by providing a template as the source.
+
 ```python
 from s3_bucket import S3Bucket
 
@@ -122,7 +126,8 @@ a legal dependency chain. Circular dependencies however will not work
 and will cause the test to fail during CloudFormation creation.
 
 A depends on B which depends on C which depends on D, B also depends on D.
-```
+
+```text
 A --> B -> C
       |    |
       |    |
@@ -131,6 +136,7 @@ A --> B -> C
 
 If you extend the Jetstream template class, you can implement the following
 methods to hook into jetstream's behavior from your subclass:
+
 - `def prepare_document(self):` run before template documentation is generated
 - `def prepare_generate(self):` run before template is generated
 - `def prepare_test(self):` run before template is tested
