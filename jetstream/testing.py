@@ -69,7 +69,9 @@ class Test(object):
         for region_env in ["AWS_DEFAULT_REGION", "DEFAULT_REGION", "REGION"]:
             region = environ.get(region_env)
             if region:
-                return region
+                # Adjusted return value to handle special case for us-east-1.
+                # See https://github.com/boto/boto3/issues/125 for details
+                return False if region == 'us-east-1' else region
 
         return False
 
